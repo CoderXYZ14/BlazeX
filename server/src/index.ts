@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
-import { basePrompt as nodeBasePrompt } from "./defaults/node";
-import { basePrompt as reactBasePrompt } from "./defaults/react";
+import { nodeBasePrompt } from "./defaults/node";
+import { reactBasePrompt } from "./defaults/react";
+
 
 import express from "express";
 import Anthropic from "@anthropic-ai/sdk";
@@ -15,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.post("/template", async (req, res) => {
   const { prompt } = req.body;
-
+  console.log(reactBasePrompt)
   const response = await anthropic.messages.create({
     messages: [
       {
@@ -32,25 +33,44 @@ app.post("/template", async (req, res) => {
 
   if (answer === "react") {
     res.json({
-      prompt: [//to be transfered to the llm
+      prompts: [
+        //to be transfered to the llm
         DEFAULT_PROMPT,
         `# Project Files\n\nThe following is a list of all project files and their complete contents that are currently visible and accessible to you.\n${reactBasePrompt} Here is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n  - .bolt/prompt`,
       ],
-      uiPrompt: { reactBasePrompt },//to create the ui
+      uiPrompts: [reactBasePrompt], //to create the ui
     });
     return;
   }
 
   if (answer === "node") {
     res.json({
-      prompt: ['# Project Files\n\nThe following is a list of all project files and their complete contents that are currently visible and accessible to you.\n${reactBasePrompt} Here is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n  - .bolt/prompt'],
-      uiPrompt: { nodeBasePrompt }
+      prompts: [
+        "# Project Files\n\nThe following is a list of all project files and their complete contents that are currently visible and accessible to you.\n${reactBasePrompt} Here is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n  - .bolt/prompt",
+      ],
+      uiPrompts: [nodeBasePrompt],
     });
     return;
   }
 
   res.status(403).json({ message: "You cant access this" });
   return;
+});
+
+app.post("/chat", async (req, res) => {
+  const { messages } = req.body;
+
+  const response = await anthropic.messages.stream({
+    messages: messages,
+    model: "claude-3-5-sonnet-20241022",
+    max_tokens: 8000,
+    system: getSystemPrompt(),
+  }).on('text', (text) => {
+    console.log(text);
+  });
+
+  console.log(response)
+  res.json({})
 });
 
 app.listen(3000);
