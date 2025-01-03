@@ -1,8 +1,8 @@
-import React from 'react';
-import { Code2 } from 'lucide-react';
-import { PromptInput } from '../components/PromptInput';
+import React from "react";
+import { Code2 } from "lucide-react";
+import { PromptInput } from "../components/PromptInput";
 
-export function Home() {
+export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-16">
@@ -14,7 +14,8 @@ export function Home() {
             Website Builder AI
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl">
-            Describe your dream website, and let AI handle the rest. Get a fully functional website with just a prompt.
+            Describe your dream website, and let AI handle the rest. Get a fully
+            functional website with just a prompt.
           </p>
           <PromptInput />
         </div>
