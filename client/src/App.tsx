@@ -1,17 +1,25 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home } from './pages/Home';
-import { Builder } from './pages/Builder';
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { Outlet } from "react-router";
 
-function App() {
+import { RootState } from "./store/store.ts";
+
+const App = () => {
+  const darkMode = useSelector((state: RootState) => state.theme.darkMode);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/builder" element={<Builder />} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      <Outlet />
+    </>
   );
-}
+};
 
 export default App;
