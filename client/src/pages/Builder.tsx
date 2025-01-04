@@ -13,26 +13,7 @@ export default function Builder() {
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const { isDark, toggleTheme } = useTheme();
 
-  const [steps, setSteps] = useState<Step[]>([
-    {
-      id: "1",
-      title: "Analyzing Prompt",
-      description: "Processing your requirements...",
-      status: "running",
-    },
-    {
-      id: "2",
-      title: "Setting Up Project",
-      description: "Creating project structure...",
-      status: "pending",
-    },
-    {
-      id: "3",
-      title: "Installing Dependencies",
-      description: "Adding required packages...",
-      status: "pending",
-    },
-  ]);
+  const [steps, setSteps] = useState<Step[]>([]);
 
   const [files, setFiles] = useState<FileNode[]>([
     {

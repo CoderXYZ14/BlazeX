@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { Send } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Send } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function PromptInput() {
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (prompt.trim()) {
-      navigate('/builder', { state: { prompt } });
+      navigate("/builder", { state: { prompt } });
     }
   };
 
