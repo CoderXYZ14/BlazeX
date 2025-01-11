@@ -4,7 +4,6 @@ dotenv.config({ path: "./.env" });
 import { nodeBasePrompt } from "./defaults/node";
 import { reactBasePrompt } from "./defaults/react";
 
-
 import express from "express";
 import Anthropic from "@anthropic-ai/sdk";
 import { DEFAULT_PROMPT, getSystemPrompt } from "./prompts";
@@ -16,7 +15,7 @@ const app = express();
 app.use(express.json());
 app.post("/template", async (req, res) => {
   const { prompt } = req.body;
-  console.log(reactBasePrompt)
+  console.log(reactBasePrompt);
   const response = await anthropic.messages.create({
     messages: [
       {
@@ -60,17 +59,19 @@ app.post("/template", async (req, res) => {
 app.post("/chat", async (req, res) => {
   const { messages } = req.body;
 
-  const response = await anthropic.messages.stream({
-    messages: messages,
-    model: "claude-3-5-sonnet-20241022",
-    max_tokens: 8000,
-    system: getSystemPrompt(),
-  }).on('text', (text) => {
-    console.log(text);
-  });
+  const response = await anthropic.messages
+    .stream({
+      messages: messages,
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 8000,
+      system: getSystemPrompt(),
+    })
+    .on("text", (text) => {
+      console.log(text);
+    });
 
-  console.log(response)
-  res.json({})
+  console.log(response);
+  res.json({});
 });
 
 app.listen(3000);
