@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { Moon, Sun, Zap } from "lucide-react";
+import { Outlet } from "react-router-dom";
+import "./App.css";
+import Header from "./components/self/Header";
 import { useSelector } from "react-redux";
-import { Outlet } from "react-router";
+import { RootState } from "./store/store";
+import { useEffect } from "react";
 
-import { RootState } from "./store/store.ts";
-
-const App = () => {
+function App() {
   const darkMode = useSelector((state: RootState) => state.theme.darkMode);
 
   useEffect(() => {
@@ -16,10 +18,11 @@ const App = () => {
   }, [darkMode]);
 
   return (
-    <>
+    <div className="h-screen flex flex-col overflow-hidden">
+      <Header />
       <Outlet />
-    </>
+    </div>
   );
-};
+}
 
 export default App;
