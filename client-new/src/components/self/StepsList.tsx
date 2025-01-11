@@ -1,4 +1,3 @@
-import React from "react";
 import { CheckCircle, Circle, Loader, XCircle } from "lucide-react";
 import type { Step, StepsListProps } from "../../types";
 

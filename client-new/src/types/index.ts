@@ -24,7 +24,6 @@ export interface FileExplorerProps {
 
 export interface CodeEditorProps {
   file: FileNode | null;
-  onChange: (value: string) => void;
 }
 
 export interface FileNode {

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 import type { CodeEditorProps } from "../../types";
 
-export function CodeEditor({ file, onChange }: CodeEditorProps) {
+export function CodeEditor({ file }: CodeEditorProps) {
   const darkMode = useSelector((state: RootState) => state.theme.darkMode);
 
   if (!file || file.type !== "file") {
@@ -40,8 +40,8 @@ export function CodeEditor({ file, onChange }: CodeEditorProps) {
       theme={darkMode ? "vs-dark" : "light"}
       language={getLanguage(file.name)}
       value={file.content}
-      onChange={(value) => onChange?.(value || "")}
       options={{
+        readOnly: true,
         fontSize: 14,
         minimap: { enabled: true },
         scrollBeyondLastLine: false,
@@ -49,6 +49,7 @@ export function CodeEditor({ file, onChange }: CodeEditorProps) {
         roundedSelection: false,
         padding: { top: 16 },
         automaticLayout: true,
+        folding: true,
       }}
     />
   );

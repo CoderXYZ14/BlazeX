@@ -1,6 +1,6 @@
 "use client";
 
-export function Preview({ content }: { content: string }) {
+export function FilePreview({ content }: { content: string }) {
   return (
     <div className="w-full h-full bg-background border rounded-lg overflow-hidden">
       <div className="h-9 border-b flex items-center px-4 bg-muted">
