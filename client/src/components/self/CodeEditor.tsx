@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 import type { CodeEditorProps } from "../../types";
 
-export function CodeEditor({ file }: CodeEditorProps) {
+export default function CodeEditor({ file }: CodeEditorProps) {
   const darkMode = useSelector((state: RootState) => state.theme.darkMode);
 
   if (!file || file.type !== "file") {

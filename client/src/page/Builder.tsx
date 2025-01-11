@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useLocation, Navigate } from "react-router-dom";
-import { CodeEditor } from "../components/self/CodeEditor";
-import { FileExplorer } from "../components/self/FileExplorer";
-import { StepsList } from "../components/self/StepsList";
+import { FileExplorer, CodeEditor, StepsList } from "@/components/self";
 import type { Step, FileNode } from "../types";
 
 export default function Builder() {

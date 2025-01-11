@@ -1,7 +1,7 @@
 import { CheckCircle, Circle, Loader, XCircle } from "lucide-react";
 import type { Step, StepsListProps } from "../../types";
 
-export function StepsList({ steps }: StepsListProps) {
+export default function StepsList({ steps }: StepsListProps) {
   const getStatusIcon = (status: Step["status"]) => {
     switch (status) {
       case "completed":

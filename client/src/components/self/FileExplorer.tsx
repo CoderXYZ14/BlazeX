@@ -63,7 +63,7 @@ function FileTreeNode({
   );
 }
 
-export function FileExplorer({
+export default function FileExplorer({
   files,
   onFileSelect,
   onToggleExpand,
