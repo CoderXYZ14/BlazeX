@@ -3,7 +3,7 @@ export interface Feature {
   description: string;
   icon: React.ComponentType<{ className?: string }>;
 }
-enum StepType {
+export enum StepType {
   CreateFile,
   CreateFolder,
   EditFile,
