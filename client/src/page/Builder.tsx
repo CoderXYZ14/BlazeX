@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, Navigate } from "react-router-dom";
 import { FileExplorer, CodeEditor, StepsList } from "@/components/self";
 import type { Step, FileNode } from "../types";
+import axios from "axios";
+import { BACKEND_URI } from "@/config";
 
 export default function Builder() {
   const location = useLocation();
@@ -17,18 +19,6 @@ export default function Builder() {
       title: "Analyzing Prompt",
       description: "Processing your requirements...",
       status: "running",
-    },
-    {
-      id: "2",
-      title: "Setting Up Project",
-      description: "Creating project structure...",
-      status: "pending",
-    },
-    {
-      id: "3",
-      title: "Installing Dependencies",
-      description: "Adding required packages...",
-      status: "pending",
     },
   ]);
 
@@ -52,13 +42,22 @@ export default function Builder() {
         },
       ],
     },
-    {
-      name: "public",
-      type: "folder",
-      expanded: false,
-      children: [],
-    },
   ]);
+  async function init() {
+    const response = await axios.post(`${BACKEND_URI}/template`, {
+      messages: prompt.trim(),
+    });
+    const { prompts, uiPrompts } = response.data;
+    const stepsResponse = await axios.post(`${BACKEND_URI}/chat`, {
+      messages: [...prompts, prompt].map((content) => ({
+        role: "user",
+        content,
+      })),
+    });
+  }
+  useEffect(() => {
+    init();
+  }, []);
 
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
 

@@ -3,15 +3,22 @@ export interface Feature {
   description: string;
   icon: React.ComponentType<{ className?: string }>;
 }
+enum StepType {
+  CreateFile,
+  CreateFolder,
+  EditFile,
+  DeleteFile,
+  RunScript,
+}
 
 export interface Step {
   id: string;
   title: string;
   description: string;
+  type?: StepType;
   status: "pending" | "running" | "completed" | "error";
   code?: string;
 }
-
 export interface StepsListProps {
   steps: Step[];
 }
@@ -32,13 +39,6 @@ export interface FileNode {
   content?: string;
   expanded?: boolean;
   children?: FileNode[];
-}
-export interface Step {
-  id: string;
-  title: string;
-  description: string;
-  status: "pending" | "running" | "completed" | "error";
-  code?: string;
 }
 
 export interface FileNode {
