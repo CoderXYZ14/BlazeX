@@ -37,7 +37,9 @@ const template = asyncHandler(async (req, res) => {
         new ApiResponse(200, {
           prompts: [
             DEFAULT_PROMPT,
-            `# Project Files\n\nThe following is a list of all project files and their complete contents that are currently visible and accessible to you.\n${reactBasePrompt} Here is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n  - .bolt/prompt`,
+            `# Project Files\n\nThe following is a list of all project files and their complete contents that are currently visible and accessible to you.\n
+            ${reactBasePrompt} 
+            Here is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n  - .bolt/prompt`,
           ],
           uiPrompts: [reactBasePrompt],
         })
@@ -76,16 +78,21 @@ const chat = asyncHandler(async (req, res) => {
   }
 
   try {
-    const response = await anthropic.messages
-      .stream({
-        messages: messages,
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 8000,
-        system: getSystemPrompt(),
-      })
-      .on("text", (text: string) => {});
+    let streamedText = "";
 
-    return res.status(200).json(new ApiResponse(200, { success: true }));
+    const response = await anthropic.messages.create({
+      messages: messages,
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 8000,
+      system: getSystemPrompt(),
+    });
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, {
+          response: (response.content[0] as TextBlock)?.text,
+        })
+      );
   } catch (error) {
     if (error instanceof ApiError) {
       throw new ApiError(error.statusCode, error.message);

@@ -40,14 +40,7 @@ export interface FileNode {
   content?: string;
   expanded?: boolean;
   children?: FileNode[];
-}
-
-export interface FileNode {
-  name: string;
-  type: "file" | "folder";
-  content?: string;
-  expanded?: boolean;
-  children?: FileNode[];
+  path?: string;
 }
 
 export interface StepsListProps {

@@ -24,31 +24,101 @@ export default function Builder() {
   ]);
 
   const [files, setFiles] = useState<FileNode[]>([
-    {
-      name: "src",
-      type: "folder",
-      expanded: true,
-      children: [
-        {
-          name: "App.tsx",
-          type: "file",
-          content:
-            'import React from "react";\n\nfunction App() {\n  return <div>Hello World</div>;\n}\n\nexport default App;',
-        },
-        {
-          name: "main.tsx",
-          type: "file",
-          content:
-            'import React from "react";\nimport ReactDOM from "react-dom/client";\nimport App from "./App";\n\nReactDOM.createRoot(document.getElementById("root")!).render(<App />);',
-        },
-      ],
-    },
+    // {
+    //   name: "src",
+    //   type: "folder",
+    //   expanded: true,
+    //   children: [
+    //     {
+    //       name: "App.tsx",
+    //       type: "file",
+    //       content:
+    //         'import React from "react";\n\nfunction App() {\n  return <div>Hello World</div>;\n}\n\nexport default App;',
+    //     },
+    //     {
+    //       name: "main.tsx",
+    //       type: "file",
+    //       content:
+    //         'import React from "react";\nimport ReactDOM from "react-dom/client";\nimport App from "./App";\n\nReactDOM.createRoot(document.getElementById("root")!).render(<App />);',
+    //     },
+    //   ],
+    // },
+    // {
+    //   name: "package.json",
+    //   type: "file",
+    //   path: "package.json",
+    //   content: "Hello World",
+    // },
   ]);
 
   useEffect(() => {
-    const step = steps.find(({ status }) => status === "pending");
-    if(step?.type===StepType.CreateFile)
+    let originalFiles = [...files];
+    let updateHappened = false;
+    steps
+      .filter(({ status }) => status === "pending")
+      .map((step) => {
+        updateHappened = true;
+        if (step?.type === StepType.CreateFile) {
+          let parsedPath = step.path?.split("/") ?? [];
+          let currentFileStructure = [...originalFiles];
+          let finalAnswerRef = currentFileStructure;
+
+          let currentFolder = "";
+          while (parsedPath.length) {
+            currentFolder = `${currentFolder}/${parsedPath[0]}/`;
+            let currentFolderName = parsedPath[0];
+            parsedPath = parsedPath.slice(1);
+
+            if (!parsedPath.length) {
+              //final file
+              let file = currentFileStructure.find(
+                (x) => x.path === currentFolder
+              );
+              if (!file) {
+                currentFileStructure.push({
+                  name: currentFolderName,
+                  type: "file",
+                  content: step.code,
+                  path: currentFolder,
+                });
+              } else {
+                file.content = step.code;
+              }
+            } else {
+              //in a folder
+              let folder = currentFileStructure.find(
+                (x) => x.path === currentFolder
+              );
+              if (!folder) {
+                currentFileStructure.push({
+                  name: currentFolderName,
+                  type: "folder",
+                  path: currentFolder,
+                  children: [],
+                });
+              }
+              currentFileStructure = currentFileStructure.find(
+                (x) => x.path === currentFolder
+              )!.children!;
+              originalFiles = finalAnswerRef;
+            }
+          }
+        }
+      });
+
+    if (updateHappened) {
+      setFiles(originalFiles);
+      setSteps((steps) =>
+        steps.map((s: Step) => {
+          return {
+            ...s,
+            status: "completed",
+          };
+        })
+      );
+    }
   }, [steps, files]);
+
   async function init() {
     const response = await axios.post(`${BACKEND_URI}/template`, {
       prompt: prompt.trim(),
@@ -56,17 +126,17 @@ export default function Builder() {
 
     const { prompts, uiPrompts } = response.data.data;
 
-    console.log();
+    //console.log(parseXml(uiPrompts[0]));
     setSteps(
       parseXml(uiPrompts[0]).map((x: Step) => ({ ...x, status: "pending" }))
     );
 
-    // const stepsResponse = await axios.post(`${BACKEND_URI}/chat`, {
-    //   messages: [...prompts, prompt].map((content) => ({
-    //     role: "user",
-    //     content,
-    //   })),
-    // });
+    const stepsResponse = await axios.post(`${BACKEND_URI}/chat`, {
+      messages: [...prompts, prompt].map((content) => ({
+        role: "user",
+        content,
+      })),
+    });
   }
 
   useEffect(() => {
