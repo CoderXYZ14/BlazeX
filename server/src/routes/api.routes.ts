@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { chat, template } from "../controllers/user.controller";
+import { chat, template } from "../controllers/api.controller";
 
 const router = Router();
 
-router.route("/tempate").post(template);
+router.route("/template").post(template);
 router.route("/chat").post(chat);
 export default router;

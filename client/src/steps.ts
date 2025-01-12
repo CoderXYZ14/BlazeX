@@ -27,7 +27,7 @@ export function parseXml(response: string): Step[] {
   // Create steps for each file
   files.forEach((file, index) => {
     const step: Step = {
-      id: `step-${index + 1}`,
+      id: `${index + 1}`,
       title: `Process ${file.filename}`,
       description: `File: ${file.filename}`,
       type: StepType.CreateFile,

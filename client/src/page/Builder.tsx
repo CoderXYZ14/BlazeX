@@ -4,6 +4,7 @@ import { FileExplorer, CodeEditor, StepsList } from "@/components/self";
 import type { Step, FileNode } from "../types";
 import axios from "axios";
 import { BACKEND_URI } from "@/config";
+import { parseXml } from "@/steps";
 
 export default function Builder() {
   const location = useLocation();
@@ -13,13 +14,13 @@ export default function Builder() {
     return <Navigate to="/" replace />;
   }
 
-  const [steps] = useState<Step[]>([
-    {
-      id: "1",
-      title: "Analyzing Prompt",
-      description: "Processing your requirements...",
-      status: "running",
-    },
+  const [steps, setSteps] = useState<Step[]>([
+    // {
+    //   id: "1",
+    //   title: "Analyzing Prompt",
+    //   description: "Processing your requirements...",
+    //   status: "running",
+    // },
   ]);
 
   const [files, setFiles] = useState<FileNode[]>([
@@ -45,16 +46,22 @@ export default function Builder() {
   ]);
   async function init() {
     const response = await axios.post(`${BACKEND_URI}/template`, {
-      messages: prompt.trim(),
+      prompt: prompt.trim(),
     });
-    const { prompts, uiPrompts } = response.data;
-    const stepsResponse = await axios.post(`${BACKEND_URI}/chat`, {
-      messages: [...prompts, prompt].map((content) => ({
-        role: "user",
-        content,
-      })),
-    });
+
+    const { prompts, uiPrompts } = response.data.data;
+
+    console.log();
+    setSteps(parseXml(uiPrompts[0]));
+
+    // const stepsResponse = await axios.post(`${BACKEND_URI}/chat`, {
+    //   messages: [...prompts, prompt].map((content) => ({
+    //     role: "user",
+    //     content,
+    //   })),
+    // });
   }
+
   useEffect(() => {
     init();
   }, []);

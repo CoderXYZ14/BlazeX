@@ -17,8 +17,6 @@ const template = asyncHandler(async (req, res) => {
   }
 
   try {
-    console.log(reactBasePrompt);
-
     const response = await anthropic.messages.create({
       messages: [
         {
@@ -85,11 +83,8 @@ const chat = asyncHandler(async (req, res) => {
         max_tokens: 8000,
         system: getSystemPrompt(),
       })
-      .on("text", (text: string) => {
-        console.log(text);
-      });
+      .on("text", (text: string) => {});
 
-    console.log(response);
     return res.status(200).json(new ApiResponse(200, { success: true }));
   } catch (error) {
     if (error instanceof ApiError) {
