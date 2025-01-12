@@ -18,6 +18,7 @@ export interface Step {
   type?: StepType;
   status: "pending" | "running" | "completed" | "error";
   code?: string;
+  path?: string;
 }
 export interface StepsListProps {
   steps: Step[];

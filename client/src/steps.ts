@@ -1,20 +1,41 @@
 import { Step, StepType } from "./types";
-
 export function parseXml(response: string): Step[] {
   const steps: Step[] = [];
+
+  // Helper function to normalize file path
+  const normalizePath = (filename: string): string => {
+    // Remove leading/trailing whitespace and ./ if present
+    let path = filename.trim().replace(/^\.\//, "");
+
+    // If the path doesn't start with src/ or other root folders,
+    // and isn't a config file, place it in src/
+    if (
+      !path.startsWith("src/") &&
+      !path.endsWith(".config.js") &&
+      !path.endsWith(".config.ts") &&
+      !path.endsWith(".json") &&
+      !path.endsWith(".html")
+    ) {
+      path = `src/${path}`;
+    }
+
+    return path;
+  };
 
   // Helper function to extract file content between code blocks
   const extractCodeBlocks = (
     text: string
-  ): { filename: string; content: string }[] => {
-    const files: { filename: string; content: string }[] = [];
+  ): { filename: string; content: string; path: string }[] => {
+    const files: { filename: string; content: string; path: string }[] = [];
     const fileRegex = /([^:\n]+):\n```(?:\w*\n)?([\s\S]*?)```/g;
     let match;
 
     while ((match = fileRegex.exec(text)) !== null) {
+      const filename = match[1].trim();
       files.push({
-        filename: match[1].trim(),
+        filename,
         content: match[2].trim(),
+        path: normalizePath(filename),
       });
     }
 
@@ -33,6 +54,7 @@ export function parseXml(response: string): Step[] {
       type: StepType.CreateFile,
       status: "pending",
       code: file.content,
+      path: file.path,
     };
 
     steps.push(step);
@@ -47,6 +69,7 @@ export function parseXml(response: string): Step[] {
       type: StepType.RunScript,
       status: "pending",
       code: response,
+      path: "src/index.ts", // Default path for generic content
     });
   }
 

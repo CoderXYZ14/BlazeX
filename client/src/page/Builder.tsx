@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, Navigate } from "react-router-dom";
 import { FileExplorer, CodeEditor, StepsList } from "@/components/self";
-import type { Step, FileNode } from "../types";
+import { type Step, type FileNode, StepType } from "../types";
 import axios from "axios";
 import { BACKEND_URI } from "@/config";
 import { parseXml } from "@/steps";
@@ -44,6 +44,11 @@ export default function Builder() {
       ],
     },
   ]);
+
+  useEffect(() => {
+    const step = steps.find(({ status }) => status === "pending");
+    if(step?.type===StepType.CreateFile)
+  }, [steps, files]);
   async function init() {
     const response = await axios.post(`${BACKEND_URI}/template`, {
       prompt: prompt.trim(),
@@ -52,7 +57,9 @@ export default function Builder() {
     const { prompts, uiPrompts } = response.data.data;
 
     console.log();
-    setSteps(parseXml(uiPrompts[0]));
+    setSteps(
+      parseXml(uiPrompts[0]).map((x: Step) => ({ ...x, status: "pending" }))
+    );
 
     // const stepsResponse = await axios.post(`${BACKEND_URI}/chat`, {
     //   messages: [...prompts, prompt].map((content) => ({
