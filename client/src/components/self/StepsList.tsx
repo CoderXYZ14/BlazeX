@@ -22,9 +22,11 @@ export default function StepsList({ steps }: StepsListProps) {
           key={step.id}
           className="flex items-start gap-2 p-2 rounded-lg hover:bg-accent hover:text-accent-foreground"
         >
-          {getStatusIcon(step.status)}
-          <div>
-            <h3 className="text-sm font-medium">{step.title}</h3>
+          <div className="flex-shrink-0">{getStatusIcon(step.status)}</div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm font-medium break-words whitespace-pre-line pr-2">
+              {step.title}
+            </h3>
             {/* <p className="text-xs text-muted-foreground">{step.description}</p> */}
             {/* {step.code && (
               <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-x-auto">

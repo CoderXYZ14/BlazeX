@@ -1,11 +1,10 @@
 import { Outlet } from "react-router-dom";
-import "./App.css";
-import Header from "./components/self/Header";
 import { useSelector } from "react-redux";
+import { useEffect, useRef } from "react";
+import Header from "./components/self/Header";
 import { RootState } from "./store/store";
-import { useEffect } from "react";
 
-function App() {
+const App = () => {
   const darkMode = useSelector((state: RootState) => state.theme.darkMode);
 
   useEffect(() => {
@@ -17,11 +16,12 @@ function App() {
   }, [darkMode]);
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen max-w-screen-2xl flex flex-col mx-auto">
       <Header />
+
       <Outlet />
     </div>
   );
-}
+};
 
 export default App;

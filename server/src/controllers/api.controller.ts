@@ -6,6 +6,7 @@ import { nodeBasePrompt } from "../utils/defaults/node";
 import { TextBlock } from "@anthropic-ai/sdk/resources";
 import Anthropic from "@anthropic-ai/sdk";
 import { DEFAULT_PROMPT, getSystemPrompt } from "../prompts";
+import { AnthropicModel } from "../constants";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -24,7 +25,8 @@ const template = asyncHandler(async (req, res) => {
           content: prompt,
         },
       ],
-      model: "claude-3-5-sonnet-20241022",
+
+      model: AnthropicModel,
       max_tokens: 100,
       system:
         "Return either node or react based on what do you think this project should be. Only return a single word 'node' or 'react'. Do not return anything extra.",
@@ -82,17 +84,15 @@ const chat = asyncHandler(async (req, res) => {
 
     const response = await anthropic.messages.create({
       messages: messages,
-      model: "claude-3-5-sonnet-20241022",
+      model: AnthropicModel,
       max_tokens: 8000,
       system: getSystemPrompt(),
     });
-    res
-      .status(200)
-      .json(
-        new ApiResponse(200, {
-          response: (response.content[0] as TextBlock)?.text,
-        })
-      );
+    res.status(200).json(
+      new ApiResponse(200, {
+        response: (response.content[0] as TextBlock)?.text,
+      })
+    );
   } catch (error) {
     if (error instanceof ApiError) {
       throw new ApiError(error.statusCode, error.message);

@@ -11,7 +11,7 @@ const Header: React.FC<HeaderProps> = () => {
     dispatch(toggleDarkMode());
   };
   return (
-    <header className="border-b sticky top-0 bg-background/80 backdrop-blur-sm z-50">
+    <header className="border-b sticky top-0 bg-background/80 backdrop-blur-sm z-50 ">
       <div className="container  px-4 h-16 flex items-center justify-between ">
         <Link to="/">
           <div className="flex items-center space-x-2 ">

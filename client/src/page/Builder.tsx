@@ -4,7 +4,7 @@ import { FileExplorer, CodeEditor, StepsList } from "@/components/self";
 import { type Step, type FileNode, StepType } from "../types";
 import axios from "axios";
 import { BACKEND_URI } from "@/config";
-import { parseXml } from "@/steps";
+import { parseXml1, parseXml2 } from "@/steps";
 
 export default function Builder() {
   const location = useLocation();
@@ -100,9 +100,9 @@ export default function Builder() {
               currentFileStructure = currentFileStructure.find(
                 (x) => x.path === currentFolder
               )!.children!;
-              originalFiles = finalAnswerRef;
             }
           }
+          originalFiles = finalAnswerRef;
         }
       });
 
@@ -128,7 +128,7 @@ export default function Builder() {
 
     //console.log(parseXml(uiPrompts[0]));
     setSteps(
-      parseXml(uiPrompts[0]).map((x: Step) => ({ ...x, status: "pending" }))
+      parseXml1(uiPrompts[0]).map((x: Step) => ({ ...x, status: "pending" }))
     );
 
     const stepsResponse = await axios.post(`${BACKEND_URI}/chat`, {
@@ -137,6 +137,15 @@ export default function Builder() {
         content,
       })),
     });
+    console.log(stepsResponse.data.data);
+
+    setSteps((s) => [
+      ...s,
+      ...parseXml2(stepsResponse.data.data.response).map((x) => ({
+        ...x,
+        status: "pending" as "pending",
+      })),
+    ]);
   }
 
   useEffect(() => {
@@ -167,7 +176,7 @@ export default function Builder() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="bg-background flex flex-col">
       <div className="flex-1 flex">
         <aside className="w-64 border-r border-border bg-card">
           <div className="p-4">

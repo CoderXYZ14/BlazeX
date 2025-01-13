@@ -43,13 +43,17 @@ export default function CodeEditor({ file }: CodeEditorProps) {
       options={{
         readOnly: true,
         fontSize: 14,
+
         minimap: { enabled: true },
-        scrollBeyondLastLine: false,
+        scrollBeyondLastLine: true,
         lineNumbers: "on",
         roundedSelection: false,
         padding: { top: 16 },
         automaticLayout: true,
         folding: true,
+        scrollbar: {
+          verticalScrollbarSize: 2,
+        },
       }}
     />
   );

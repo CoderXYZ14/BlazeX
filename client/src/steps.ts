@@ -1,5 +1,5 @@
 import { Step, StepType } from "./types";
-export function parseXml(response: string): Step[] {
+export function parseXml1(response: string): Step[] {
   const steps: Step[] = [];
 
   // Helper function to normalize file path
@@ -70,6 +70,106 @@ export function parseXml(response: string): Step[] {
       status: "pending",
       code: response,
       path: "src/index.ts", // Default path for generic content
+    });
+  }
+
+  return steps;
+}
+
+export function parseXml2(response: string): Step[] {
+  const steps: Step[] = [];
+
+  // Helper function to extract content between tags
+  const extractContent = (
+    str: string,
+    tagName: string
+  ): { content: string; rest: string } => {
+    const startTag = `<${tagName}`;
+    const endTag = `</${tagName}>`;
+
+    const startIndex = str.indexOf(startTag);
+    if (startIndex === -1) return { content: "", rest: str };
+
+    const endIndex = str.indexOf(endTag);
+    if (endIndex === -1) return { content: "", rest: str };
+
+    const contentStart = str.indexOf(">", startIndex) + 1;
+    const content = str.slice(contentStart, endIndex);
+    const rest = str.slice(endIndex + endTag.length);
+
+    return { content, rest };
+  };
+
+  // Helper function to extract attributes
+  const extractAttributes = (str: string): Record<string, string> => {
+    const attrs: Record<string, string> = {};
+    const regex = /(\w+)="([^"]*)"/g;
+    let match;
+
+    while ((match = regex.exec(str)) !== null) {
+      attrs[match[1]] = match[2];
+    }
+
+    return attrs;
+  };
+
+  // Find boltArtifact content
+  const { content: artifactContent } = extractContent(response, "boltArtifact");
+
+  if (artifactContent) {
+    // Find all boltAction blocks
+    const actionRegex = /<boltAction[^>]*>[\s\S]*?<\/boltAction>/g;
+    const actions = artifactContent.match(actionRegex) || [];
+
+    actions.forEach((action, index) => {
+      // Extract action attributes
+      const typeMatch = action.match(/type="([^"]*)"/);
+      const filePathMatch = action.match(/filePath="([^"]*)"/);
+
+      const type = typeMatch ? typeMatch[1] : "unknown";
+      const filePath = filePathMatch ? filePathMatch[1] : "";
+
+      // Extract code content
+      const { content: codeContent } = extractContent(action, "boltAction");
+
+      let stepType: StepType;
+      switch (type) {
+        case "file":
+          stepType = StepType.CreateFile;
+          break;
+        case "shell":
+          stepType = StepType.RunScript;
+          break;
+        default:
+          stepType = StepType.CreateFile;
+      }
+
+      const step: Step = {
+        id: `${index + 1}`,
+        title: filePath ? `Create ${filePath}` : `Execute ${type} command`,
+        description: filePath
+          ? `Creating file at ${filePath}`
+          : `Executing ${type} action`,
+        type: stepType,
+        status: "pending",
+        code: codeContent.trim(),
+        path: filePath || undefined,
+      };
+
+      steps.push(step);
+    });
+  }
+
+  // If no steps were created, create a fallback step
+  if (steps.length === 0) {
+    steps.push({
+      id: "1",
+      title: "Process Content",
+      description: "Process provided content",
+      type: StepType.RunScript,
+      status: "pending",
+      code: response,
+      path: "src/index.ts",
     });
   }
 
