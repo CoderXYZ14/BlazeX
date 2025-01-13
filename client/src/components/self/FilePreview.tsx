@@ -1,20 +1,41 @@
 "use client";
 
-export function FilePreview({ content }: { content: string }) {
+import { WebContainer } from "@webcontainer/api";
+import { useEffect, useState } from "react";
+
+interface FilePreviewProps {
+  files: any[];
+  webContainer: WebContainer;
+}
+
+export function FilePreview({ files, webContainer }: FilePreviewProps) {
+  const [url, setUrl] = useState<string>("");
+  async function main() {
+    const installProcess = await webContainer.spawn("npm", ["install"]);
+    installProcess.output.pipeTo(
+      new WritableStream({
+        write(data) {
+          console.log(data);
+        },
+      })
+    );
+
+    await webContainer.spawn("npm", ["run", "dev"]);
+
+    // Wait for `server-ready` event
+    webContainer.on("server-ready", (port, url) => {
+      // ...
+      console.log(url);
+      console.log(port);
+      setUrl(url);
+    });
+  }
+  useEffect(() => {
+    main();
+  }, []);
   return (
     <div className="w-full h-full bg-background border rounded-lg overflow-hidden">
-      <div className="h-9 border-b flex items-center px-4 bg-muted">
-        <div className="flex space-x-2">
-          <div className="w-3 h-3 rounded-full bg-red-500" />
-          <div className="w-3 h-3 rounded-full bg-yellow-500" />
-          <div className="w-3 h-3 rounded-full bg-green-500" />
-        </div>
-      </div>
-      <iframe
-        srcDoc={content}
-        className="w-full h-[calc(100%-36px)]"
-        sandbox="allow-scripts"
-      />
+      {url && <iframe src={url} className="w-full h-[calc(100%-36px)]" />}
     </div>
   );
 }

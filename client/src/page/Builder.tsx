@@ -10,6 +10,7 @@ import { Code, Eye } from "lucide-react";
 import { FilePreview } from "@/components/self/FilePreview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useWebContainer } from "@/hooks";
 
 export default function Builder() {
   const location = useLocation();
@@ -19,6 +20,7 @@ export default function Builder() {
     return <Navigate to="/" replace />;
   }
 
+  const webcontainer = useWebContainer();
   const [steps, setSteps] = useState<Step[]>([
     // {
     //   id: "1",
@@ -124,14 +126,57 @@ export default function Builder() {
     }
   }, [steps, files]);
 
+  useEffect(() => {
+    const createMountStructure = (files: FileNode[]): Record<string, any> => {
+      const mountStructure: Record<string, any> = {};
+
+      const processFile = (file: FileNode, isRootFolder: boolean) => {
+        if (file.type === "folder") {
+          // For folders, create a directory entry
+          mountStructure[file.name] = {
+            directory: file.children
+              ? Object.fromEntries(
+                  file.children.map((child) => [
+                    child.name,
+                    processFile(child, false),
+                  ])
+                )
+              : {},
+          };
+        } else if (file.type === "file") {
+          if (isRootFolder) {
+            mountStructure[file.name] = {
+              file: {
+                contents: file.content || "",
+              },
+            };
+          } else {
+            return {
+              file: {
+                contents: file.content || "",
+              },
+            };
+          }
+          // For files, create a file entry with contents
+        }
+
+        return mountStructure[file.name];
+      };
+
+      files.forEach((file) => processFile(file, true));
+      return mountStructure;
+    };
+    const structure = createMountStructure(files);
+    console.log(structure);
+    webcontainer?.mount(structure);
+  }, [files, webcontainer]);
+
   async function init() {
     const response = await axios.post(`${BACKEND_URI}/template`, {
       prompt: prompt.trim(),
     });
 
     const { prompts, uiPrompts } = response.data.data;
-
-    //console.log(parseXml(uiPrompts[0]));
     setSteps(
       parseXml1(uiPrompts[0]).map((x: Step) => ({ ...x, status: "pending" }))
     );
@@ -242,7 +287,7 @@ export default function Builder() {
                     className="flex-1 m-0 rounded border border-border overflow-hidden"
                   >
                     <div className="h-full max-h-[calc(100vh-16rem)] overflow-auto">
-                      <FilePreview content={selectedFile?.content || ""} />
+                      <FilePreview files={files} webContainer={webcontainer} />
                     </div>
                   </TabsContent>
                 </div>
