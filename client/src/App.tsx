@@ -1,9 +1,9 @@
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Header from "./components/self/Header";
 import { RootState } from "./store/store";
-
+import "./App.css";
 const App = () => {
   const darkMode = useSelector((state: RootState) => state.theme.darkMode);
 

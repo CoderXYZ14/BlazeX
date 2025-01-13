@@ -5,6 +5,11 @@ import { type Step, type FileNode, StepType } from "../types";
 import axios from "axios";
 import { BACKEND_URI } from "@/config";
 import { parseXml1, parseXml2 } from "@/steps";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Code, Eye } from "lucide-react";
+import { FilePreview } from "@/components/self/FilePreview";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function Builder() {
   const location = useLocation();
@@ -176,9 +181,9 @@ export default function Builder() {
   };
 
   return (
-    <div className="bg-background flex flex-col">
-      <div className="flex-1 flex">
-        <aside className="w-64 border-r border-border bg-card">
+    <div className="bg-background flex flex-col h-[calc(100vh-100px)]">
+      <div className="flex-1 flex overflow-hidden">
+        <aside className="w-64 border-r border-border bg-card overflow-y-auto">
           <div className="p-4">
             <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
               Build Progress
@@ -186,8 +191,8 @@ export default function Builder() {
             <StepsList steps={steps} />
           </div>
         </aside>
-        <main className="flex-1 flex">
-          <div className="w-72 border-r border-border bg-card">
+        <main className="flex-1 flex overflow-hidden">
+          <div className="w-72 border-r border-border bg-card overflow-y-auto">
             <div className="p-4">
               <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
                 Files
@@ -199,8 +204,60 @@ export default function Builder() {
               />
             </div>
           </div>
-          <div className="flex-1">
-            <CodeEditor file={selectedFile} />
+          <div className="flex-1 flex flex-col overflow-hidden p-6 bg-muted/10">
+            <div className="bg-background rounded-lg shadow-sm border border-border flex-1 flex flex-col overflow-hidden">
+              <Tabs
+                defaultValue="code"
+                className="flex-1 flex flex-col overflow-hidden"
+              >
+                <div className="border-b border-border px-4 flex-shrink-0">
+                  <TabsList className="h-12">
+                    <TabsTrigger
+                      value="code"
+                      className="flex items-center gap-2"
+                    >
+                      <Code className="h-4 w-4" />
+                      Code
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="preview"
+                      className="flex items-center gap-2"
+                    >
+                      <Eye className="h-4 w-4" />
+                      Preview
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                <div className="flex-1 flex flex-col overflow-hidden p-4">
+                  <TabsContent
+                    value="code"
+                    className="flex-1 m-0 rounded border border-border overflow-hidden"
+                  >
+                    <div className="h-full max-h-[calc(100vh-16rem)] overflow-auto">
+                      <CodeEditor file={selectedFile} />
+                    </div>
+                  </TabsContent>
+                  <TabsContent
+                    value="preview"
+                    className="flex-1 m-0 rounded border border-border overflow-hidden"
+                  >
+                    <div className="h-full max-h-[calc(100vh-16rem)] overflow-auto">
+                      <FilePreview content={selectedFile?.content || ""} />
+                    </div>
+                  </TabsContent>
+                </div>
+              </Tabs>
+              <div className="border-t border-border p-4 bg-background flex-shrink-0">
+                <form className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Ask a follow-up question..."
+                    className="flex-1"
+                  />
+                  <Button type="submit">Send</Button>
+                </form>
+              </div>
+            </div>
           </div>
         </main>
       </div>
