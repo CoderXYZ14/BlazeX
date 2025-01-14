@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc -b && nodemon dist/index.js"
+    "start": "node dist/index.js",
+    "dev": "tsc -b && nodemon dist/index.js",
+    "build": "tsc -b"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +16,8 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "typescript": "^5.7.3"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.8",
