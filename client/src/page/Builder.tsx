@@ -15,11 +15,7 @@ import { useWebContainer } from "@/hooks";
 export default function Builder() {
   const location = useLocation();
   const prompt = location.state?.prompt;
-  const [userPrompt, setPrompt] = useState<string | null>("");
 
-  const [llmMessage, setLlmMessage] = useState<
-    { role: "user" | "assistant"; content: string }[] | null
-  >([]);
   if (!prompt) {
     return <Navigate to="/" replace />;
   }
@@ -191,6 +187,7 @@ export default function Builder() {
         content,
       })),
     });
+    console.log(stepsResponse.data.data);
 
     setSteps((s) => [
       ...s,
@@ -198,20 +195,6 @@ export default function Builder() {
         ...x,
         status: "pending" as "pending",
       })),
-    ]);
-    setLlmMessage(
-      [...prompts, prompt].map((content) => ({
-        role: "user",
-        content,
-      }))
-    );
-
-    setLlmMessage((x) => [
-      ...x,
-      {
-        role: "assistant",
-        content: stepsResponse.data.data.response,
-      },
     ]);
   }
 
@@ -304,7 +287,12 @@ export default function Builder() {
                     className="flex-1 m-0 rounded border border-border overflow-hidden"
                   >
                     <div className="h-full max-h-[calc(100vh-16rem)] overflow-auto">
-                      <FilePreview files={files} webContainer={webcontainer} />
+                      {webcontainer && (
+                        <FilePreview
+                          files={files}
+                          webContainer={webcontainer}
+                        />
+                      )}
                     </div>
                   </TabsContent>
                 </div>
@@ -317,30 +305,30 @@ export default function Builder() {
                     const inputElement = (
                       e.target as HTMLFormElement
                     ).elements.namedItem("question") as HTMLInputElement;
-                    setPrompt(inputElement.value);
+                    // setPrompt(inputElement.value);
                   }}
                 >
                   <Input
                     type="text"
                     placeholder="Ask a follow-up question..."
                     className="flex-1"
-                    value={userPrompt}
-                    onChange={(e) => setPrompt(e.target.value)}
+                    //   value={userPrompt}
+                    //   onChange={(e) => setPrompt(e.target.value)}
                   />
                   <Button
-                    onClick={async () => {
-                      const newMessage = {
-                        role: "user" as "user",
-                        content: userPrompt,
-                      };
-                      const stepsResponse = await axios.post(
-                        `${BACKEND_URI}/chat`,
-                        {
-                          messages: [...(llmMessage || []), newMessage],
-                        }
-                      );
-                      setLlmMessage((x) => [...x, newMessage]);
-                    }}
+                    // onClick={async () => {
+                    //   const newMessage = {
+                    //     role: "user" as "user",
+                    //     content: userPrompt,
+                    //   };
+                    //   const stepsResponse = await axios.post(
+                    //     `${BACKEND_URI}/chat`,
+                    //     {
+                    //       messages: [...(llmMessage || []), newMessage],
+                    //     }
+                    //   );
+                    //   setLlmMessage((x) => [...x, newMessage]);
+                    // }}
                     type="submit"
                   >
                     Send

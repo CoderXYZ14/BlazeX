@@ -13,7 +13,12 @@ export default function Home() {
       navigate("/builder", { state: { prompt } });
     }
   };
-
+  const handleTemplateClick = (template: string) => {
+    setPrompt(`Create a ${template.toLowerCase()} website`);
+    navigate("/builder", {
+      state: { prompt: `Create a ${template.toLowerCase()} website` },
+    });
+  };
   return (
     <div className="flex-1 flex flex-col">
       <main className="flex-1 flex flex-col items-center justify-center">
@@ -64,7 +69,12 @@ export default function Home() {
                 "Landing Page",
                 "Dashboard",
               ].map((template) => (
-                <Button key={template} variant="outline" className="min-w-32">
+                <Button
+                  key={template}
+                  onClick={() => handleTemplateClick(template)}
+                  variant="outline"
+                  className="min-w-32"
+                >
                   {template}
                 </Button>
               ))}
