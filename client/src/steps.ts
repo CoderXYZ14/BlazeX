@@ -101,17 +101,6 @@ export function parseXml2(response: string): Step[] {
   };
 
   // Helper function to extract attributes
-  const extractAttributes = (str: string): Record<string, string> => {
-    const attrs: Record<string, string> = {};
-    const regex = /(\w+)="([^"]*)"/g;
-    let match;
-
-    while ((match = regex.exec(str)) !== null) {
-      attrs[match[1]] = match[2];
-    }
-
-    return attrs;
-  };
 
   // Find boltArtifact content
   const { content: artifactContent } = extractContent(response, "boltArtifact");

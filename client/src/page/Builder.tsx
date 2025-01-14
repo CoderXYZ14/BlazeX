@@ -306,10 +306,7 @@ export default function Builder() {
                   >
                     <div className="h-full max-h-[calc(100vh-16rem)] overflow-auto">
                       {webcontainer && (
-                        <FilePreview
-                          files={files}
-                          webContainer={webcontainer}
-                        />
+                        <FilePreview webContainer={webcontainer} />
                       )}
                     </div>
                   </TabsContent>

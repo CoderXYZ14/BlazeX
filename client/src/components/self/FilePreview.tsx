@@ -2,10 +2,9 @@ import { WebContainer } from "@webcontainer/api";
 import { useEffect, useState } from "react";
 
 interface FilePreviewProps {
-  files: any[];
   webContainer: WebContainer;
 }
-export function FilePreview({ files, webContainer }: FilePreviewProps) {
+export function FilePreview({ webContainer }: FilePreviewProps) {
   const [url, setUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
