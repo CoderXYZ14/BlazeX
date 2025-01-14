@@ -85,7 +85,7 @@ const chat = asyncHandler(async (req, res) => {
     const response = await anthropic.messages.create({
       messages: messages,
       model: AnthropicModel,
-      max_tokens: 8000,
+      max_tokens: 16000,
       system: getSystemPrompt(),
     });
     res.status(200).json(

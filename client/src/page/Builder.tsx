@@ -19,6 +19,10 @@ export default function Builder() {
   if (!prompt) {
     return <Navigate to="/" replace />;
   }
+  const [userPrompt, setPrompt] = useState("");
+  const [llmMessage, setLlmMessage] = useState<
+    { role: "user" | "assistant"; content: string }[]
+  >([]);
 
   const webcontainer = useWebContainer();
   const [steps, setSteps] = useState<Step[]>([
@@ -196,6 +200,16 @@ export default function Builder() {
         status: "pending" as "pending",
       })),
     ]);
+    setLlmMessage(
+      [...prompts, prompt].map((content) => ({
+        role: "user",
+        content,
+      }))
+    );
+    setLlmMessage((x) => [
+      ...x,
+      { role: "assistant", content: stepsResponse.data.data.response },
+    ]);
   }
 
   useEffect(() => {
@@ -298,42 +312,49 @@ export default function Builder() {
                 </div>
               </Tabs>
               <div className="border-t border-border p-4 bg-background flex-shrink-0">
-                <form
-                  className="flex gap-2"
-                  onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-                    e.preventDefault();
-                    const inputElement = (
-                      e.target as HTMLFormElement
-                    ).elements.namedItem("question") as HTMLInputElement;
-                    // setPrompt(inputElement.value);
-                  }}
-                >
+                <div className="flex gap-2">
                   <Input
                     type="text"
                     placeholder="Ask a follow-up question..."
                     className="flex-1"
-                    //   value={userPrompt}
-                    //   onChange={(e) => setPrompt(e.target.value)}
+                    value={userPrompt}
+                    onChange={(e) => setPrompt(e.target.value)}
                   />
                   <Button
-                    // onClick={async () => {
-                    //   const newMessage = {
-                    //     role: "user" as "user",
-                    //     content: userPrompt,
-                    //   };
-                    //   const stepsResponse = await axios.post(
-                    //     `${BACKEND_URI}/chat`,
-                    //     {
-                    //       messages: [...(llmMessage || []), newMessage],
-                    //     }
-                    //   );
-                    //   setLlmMessage((x) => [...x, newMessage]);
-                    // }}
-                    type="submit"
+                    onClick={async () => {
+                      const newMessage = {
+                        role: "user" as "user",
+                        content: userPrompt,
+                      };
+
+                      const stepsResponse = await axios.post(
+                        `${BACKEND_URI}/chat`,
+                        {
+                          messages: [...llmMessage, newMessage],
+                        }
+                      );
+                      setLlmMessage((x) => [...x, newMessage]);
+                      setLlmMessage((x) => [
+                        ...x,
+                        {
+                          role: "assistant",
+                          content: stepsResponse.data.data.response,
+                        },
+                      ]);
+                      setSteps((s) => [
+                        ...s,
+                        ...parseXml2(stepsResponse.data.data.response).map(
+                          (x) => ({
+                            ...x,
+                            status: "pending" as "pending",
+                          })
+                        ),
+                      ]);
+                    }}
                   >
                     Send
                   </Button>
-                </form>
+                </div>
               </div>
             </div>
           </div>
