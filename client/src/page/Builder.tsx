@@ -6,7 +6,7 @@ import axios from "axios";
 import { BACKEND_URI } from "@/config";
 import { parseXml1, parseXml2 } from "@/steps";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code, Eye } from "lucide-react";
+import { Code, Eye, Loader2 } from "lucide-react";
 import { FilePreview } from "@/components/self/FilePreview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { useWebContainer } from "@/hooks";
 export default function Builder() {
   const location = useLocation();
   const prompt = location.state?.prompt;
-
+  const [isLoading, setIsLoading] = useState(false);
   if (!prompt) {
     return <Navigate to="/" replace />;
   }
@@ -61,7 +61,8 @@ export default function Builder() {
     //   content: "Hello World",
     // },
   ]);
-
+  const [activeTab, setActiveTab] = useState("code");
+  `1op-`;
   useEffect(() => {
     let originalFiles = [...files];
     let updateHappened = false;
@@ -210,8 +211,10 @@ export default function Builder() {
       ...x,
       { role: "assistant", content: stepsResponse.data.data.response },
     ]);
-  }
 
+    // Switch to preview tab after chat is complete
+    setActiveTab("preview");
+  }
   useEffect(() => {
     init();
   }, []);
@@ -266,7 +269,8 @@ export default function Builder() {
           <div className="flex-1 flex flex-col overflow-hidden p-6 bg-muted/10">
             <div className="bg-background rounded-lg shadow-sm border border-border flex-1 flex flex-col overflow-hidden">
               <Tabs
-                defaultValue="code"
+                value={activeTab}
+                onValueChange={setActiveTab}
                 className="flex-1 flex flex-col overflow-hidden"
               >
                 <div className="border-b border-border px-4 flex-shrink-0">
@@ -322,37 +326,58 @@ export default function Builder() {
                   />
                   <Button
                     onClick={async () => {
-                      const newMessage = {
-                        role: "user" as "user",
-                        content: userPrompt,
-                      };
+                      if (!userPrompt.trim() || isLoading) return;
 
-                      const stepsResponse = await axios.post(
-                        `${BACKEND_URI}/chat`,
-                        {
-                          messages: [...llmMessage, newMessage],
-                        }
-                      );
-                      setLlmMessage((x) => [...x, newMessage]);
-                      setLlmMessage((x) => [
-                        ...x,
-                        {
-                          role: "assistant",
-                          content: stepsResponse.data.data.response,
-                        },
-                      ]);
-                      setSteps((s) => [
-                        ...s,
-                        ...parseXml2(stepsResponse.data.data.response).map(
-                          (x) => ({
-                            ...x,
-                            status: "pending" as "pending",
-                          })
-                        ),
-                      ]);
+                      setIsLoading(true);
+                      try {
+                        const newMessage = {
+                          role: "user" as "user",
+                          content: userPrompt,
+                        };
+
+                        const stepsResponse = await axios.post(
+                          `${BACKEND_URI}/chat`,
+                          {
+                            messages: [...llmMessage, newMessage],
+                          }
+                        );
+
+                        setLlmMessage((x) => [...x, newMessage]);
+                        setLlmMessage((x) => [
+                          ...x,
+                          {
+                            role: "assistant",
+                            content: stepsResponse.data.data.response,
+                          },
+                        ]);
+
+                        setSteps((s) => [
+                          ...s,
+                          ...parseXml2(stepsResponse.data.data.response).map(
+                            (x) => ({
+                              ...x,
+                              status: "pending" as "pending",
+                            })
+                          ),
+                        ]);
+
+                        setPrompt(""); // Clear the input after sending
+                      } catch (error) {
+                        console.error("Error sending prompt:", error);
+                      } finally {
+                        setIsLoading(false);
+                      }
                     }}
+                    disabled={isLoading || !userPrompt.trim()}
                   >
-                    Send
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send"
+                    )}
                   </Button>
                 </div>
               </div>

@@ -17,9 +17,9 @@ export default function StepsList({ steps }: StepsListProps) {
 
   return (
     <div className="space-y-2">
-      {steps.map((step) => (
+      {steps.map((step, index) => (
         <div
-          key={step.id}
+          key={`${step.id}-${index}`} // Combine step.id and index to ensure uniqueness
           className="flex items-start gap-2 p-2 rounded-lg hover:bg-accent hover:text-accent-foreground"
         >
           <div className="flex-shrink-0">{getStatusIcon(step.status)}</div>
@@ -27,12 +27,6 @@ export default function StepsList({ steps }: StepsListProps) {
             <h3 className="text-sm font-medium break-words whitespace-pre-line pr-2">
               {step.title}
             </h3>
-            {/* <p className="text-xs text-muted-foreground">{step.description}</p> */}
-            {/* {step.code && (
-              <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-x-auto">
-                <code>{step.code}</code>
-              </pre>
-            )} */}
           </div>
         </div>
       ))}
