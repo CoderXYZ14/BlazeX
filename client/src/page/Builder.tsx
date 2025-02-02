@@ -177,21 +177,29 @@ export default function Builder() {
   }, [files, webcontainer]);
 
   async function init() {
-    const response = await axios.post(`${BACKEND_URI}/template`, {
-      prompt: prompt.trim(),
-    });
+    const response = await axios.post(
+      `${BACKEND_URI}/template`,
+      {
+        prompt: prompt.trim(),
+      },
+      { withCredentials: true }
+    );
 
     const { prompts, uiPrompts } = response.data.data;
     setSteps(
       parseXml1(uiPrompts[0]).map((x: Step) => ({ ...x, status: "pending" }))
     );
 
-    const stepsResponse = await axios.post(`${BACKEND_URI}/chat`, {
-      messages: [...prompts, prompt].map((content) => ({
-        role: "user",
-        content,
-      })),
-    });
+    const stepsResponse = await axios.post(
+      `${BACKEND_URI}/chat`,
+      {
+        messages: [...prompts, prompt].map((content) => ({
+          role: "user",
+          content,
+        })),
+      },
+      { withCredentials: true }
+    );
     console.log(stepsResponse.data.data);
 
     setSteps((s) => [
@@ -336,7 +344,8 @@ export default function Builder() {
                           `${BACKEND_URI}/chat`,
                           {
                             messages: [...llmMessage, newMessage],
-                          }
+                          },
+                          { withCredentials: true }
                         );
 
                         setLlmMessage((x) => [...x, newMessage]);
