@@ -1,1 +1,1 @@
-export const BACKEND_URI = "https://blazex-backend.onrender.com/api/v1";
+export const BACKEND_URI = "https://blazex-backend-zeta.vercel.app/api/v1";

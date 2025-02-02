@@ -16,7 +16,7 @@ const App = () => {
   }, [darkMode]);
 
   return (
-    <div className="h-screen max-w-screen-2xl flex flex-col mx-auto">
+    <div className="h-screen max-w-screen-2xl flex flex-col ">
       <Header />
 
       <Outlet />
