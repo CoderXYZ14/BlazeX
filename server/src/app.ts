@@ -16,4 +16,8 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 app.use("/api/v1", apiRouter);
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 export { app };
